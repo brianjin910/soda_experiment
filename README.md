@@ -52,5 +52,11 @@ No unexplained structure in the data
 
 Given the small sample size, no prior power analysis was done. Instead, a post-hoc power analysis will be conducted based on the results to evaluate effect sizes.
 
-## Technical Notes
-The only issue that came up was related to temperature control. Since the experiment was done indoors during winter, the room temperature dropped over time, triggering the heater to turn on. That shift may have influenced the starting temperature of some drinks. Aside from that, the experiment ran smoothly without any major complications.
+##  References
+Lefebvre, S., & Orlowski, M. (2019). Can, cup, or bottle? The influence of beverage vessel on taste and willingness to pay. International journal of hospitality management, 76, 194-205.
+
+Suhag, N. (2017). Functional non-alcoholic beverages: Shifts in the purchasing patterns of non-alcoholic beverages. Available at SSRN 2992428.
+
+Breneiser, J. E., & Allen, S. N. (2011). Taste Preference for Brand Name versus Store Brand Sodas. North American Journal of Psychology, 13(2).
+
+power_factorial_32.R script file created by Professor Peter Chi @ UCSB
