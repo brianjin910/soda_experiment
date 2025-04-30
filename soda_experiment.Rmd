@@ -1,0 +1,371 @@
+---
+title: "Final Project"
+author: "Brian Jin"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+The beverage industry is continuously innovating with consumer preferences changing over the years based on various factors including, but not limited by, environmental, nutritional value, packaging, and marketing. With demand for traditional soft-drinks steadily declining over the past decades (Suhag, 2017), many brands are struggling to market such drinks that carry a stigma of being unhealthy. As technology quickly advances, information becomes infinitely more accessible to the majority of the population through the internet. Particularly speaking, awareness of ingredients in beverages increases significantly, which drastically shifts people's views on a beverage in terms of nutritional value.
+
+That being said, this gives a huge opportunity to many new brands and companies in creating a new super juice full of nourishing and beneficial ingredients, which in turn is healthy for the economy and global population. However, it is still important to take notice of the negative effects that this will have on the current beverage industry, despite still promoting less-healthy beverages. For example, a smaller brand sugar-free soft-drinks would struggle to generate sales of their product due to the vast amount of "healthy" drinks overshadowing their promotion.
+
+Now, a potential strategy of the brand would be to sell their drinks in a location specifically for consumers to enjoy refreshing beverages, like a bar. Sponsoring or promoting in a bar would be a viable way for the brand to reach its target market and potentially increase awareness even further. This brings up an important component of the business that the brand must not ignore, which would be their core consumer product--the drink itself. In order for the promotion to be successful, the drink must first be worthy of such success.
+
+A customer's impression of a drink can vary depending on many factors aside from the drink itself, including the presentation, temperature, aroma, and taste. Even the smallest of details could alter an impression significantly, such as the sensory feeling a customer has as their lips touches the cup material of the drink and the temperature or dilution caused by a couple pieces of ice. Understanding the subtle impacts of these factors can guide the business to success through appeasing every customer that enters the establishment and swaying them to revisit or purchase the drink itself. This gives the brand a lot of potential in increasing customer satisfaction without having to tweak or change their product.
+
+A previous study discovered that the container holding the drink influences a customer's expectations, perceptions, and willingness to pay for a drink (Lefebvre, 2019). This study was performed virtually, where participants only shared opinions based on images shown of drinks in different containers. Despite that, the results allows us to safely assume that the container of a drink contributes to a customer's satisfaction of that drink for at least some sensory factor. With this information, we aim to uncover the contribution to a customer's satisfaction caused by the material of the container--specifically the material of a service cup.
+
+Cup material can be highly influential in appealing to one of the sensory experiences that a customer has when drinking a beverage. Aside from the textural feeling of the material, each material insulates different levels of heat, resulting in drinks of different temperatures. Along with that, the introduction of ice interacts with each level of insulation, giving a unique cooling effect. For example, high insulation metal cups, such as aluminum or stainless steel, are incredibly efficient at keeping consistent temperatures, but could be detrimental to a customer's perception of a drink if it is too cold if ice is added. Thus, balancing these factors in order to maintain the perfect temperature is critical, which we hypothesize that better insulators lead to colder and better tasting drinks.
+
+By exploring each combination of drinks, we hope to be capable of identifying the effect of each factor and their interactions with each other in order to discover the ideal combination of factors to maximize satisfaction for customers.
+
+# Methods
+
+## Study Design
+
+This study utilized a full factorial design with blocking to determine the relationships between each individual factor with the taste of the drink and the relationships between each of the factors themselves. Participants in this experiment would be served six drinks total, each being a unique treatment combination, with a palate cleanser as a sip of water in between every drink. There were two factors of interest studied in this experiment. Factor 1 (ice) had 2 levels: (1) yes ice and (2) no ice. Factor 2 (serving cup material) had 3 levels: (1) glass, (2) polystyrene for plastic, and (3) stainless steel for metal. 
+
+## Blocking and Randomization
+
+Blocking in this study is represented by each individual participant. The order of treatment combinations were randomized within blocks, meaning that each participant had exactly one of each combination in a random order. Since there were six participants in total, there is a sample size of $n = 36$ observations. Since there were no previous studies with sufficient information to base a power analysis for calculating a good sample size, the experiment was conducted with as many willing participants that could be found. Instead, a post-hoc power analysis will be conducted later in this study to observe the estimated effect sizes of multiple factors.
+
+Additionally to reduce effects of extraneous variables, each of the three cups will be washed and reused for all experiments. If ice was used in a treatment combination, it would always go in before the drink. The type of soda will be the same and stay room temperature before being served to participants for all experiments, but brand will not be disclosed in this experiment.
+
+## Photographic Documentation
+
+![The three cups used in the experiment, left is plastic, right is glass, and center is metal]("soda_experiment.jpeg")
+
+## Data Collection, Statistical Methods, and Assumptions
+
+Data will be stored into a rectangular data frame with 4 columns, taste score, ice factor, cup material factor, and block.
+
+Following that, multiple linear models will be created, including a full model with all factors and blocking and several null models with some combination of factors and blocking. Since we do not generally care about blocking and its interaction with either factor, every null model will include blocking while testing interactions in order to control its variability and isolate the effects of the other factors. Partial-F tests will be used to determine if a factor and its interaction with the other factor and the interaction itself is significantly significant, meaning it has an impact on taste score. These are performed by utilizing an Anova (Analysis of Variance) function on a null model without the factor of interest and the full model.
+
+The assumptions required for performed the tests in a 2 by 3 factorial design include normality of the data, no structure to the data, and equal variances. These assumptions are necessary for conducting these tests, but might not be satisfied due to potential problems that arise due to the design of this experiment. If one treatment was a comfort pick and had a significantly more consistent rating that other drinks, it could cause in imbalance in variances. Along with that, common rating ceiling or floors could displace the normality of the data if it was skewed. 
+
+## Technical Issues
+
+One technical issue that came up was storage of drinks in a room temperature environment. Since this experiment was conducted indoors during the winter, the temperature would decrease over time, which also automatically turned on the heater. This could have affected the temperature of the drinks before it was poured, causing a bias in the data. Aside from that, no other technical issue emerged when collecting the data.
+
+```{r, warning=FALSE, message = FALSE}
+library(readxl)
+library(knitr)
+library(ggplot2)
+library(tidyverse)
+library(magrittr)
+set.seed(10292005)
+```
+
+# Results
+
+## Data Visualization
+
+```{r, fig.align = "center", out.width = "80%"}
+soda_df <- read_excel("soda_taste.xlsx")
+soda_df$block <- as.factor(soda_df$block)
+
+soda_df %>% ggplot(aes(x = ice, y = score, color = material)) +
+  geom_point(position = position_dodge(width=0.3)) +
+  facet_grid(cols = vars(block)) +
+  scale_color_discrete(limits = c("plastic", "glass", "metal")) +
+  labs(title = "Participant's Taste Scores for Each Combination",
+       subtitle = "Figure 1",
+       x = "Ice", y = "Score", color = "Material")
+```
+
+Figure 1 displays all 6 participant's scores for each treatment combination side by side. We can see that for all six participants, having ice in the drink increased most of their scores. This could potentially mean that the factor of ice has an impact on taste score, but nothing can be determined yet. Another detail that could be recognized from the figure is that for most of the participants, plastic as a cup material produces the lowest tasting scores, regardless of ice or not.
+
+## Hypothesis Tests
+
+After visualizing our data, we will create our full model and null models used in partial-F testing to determine the statistical significance of the factors and their interactions with one another. 
+
+```{r}
+# Full Model
+model1 <- lm(score ~ ice + material + ice * material + block, soda_df)
+
+output_model <- signif(summary(model1)$coefficients, 4)
+output_model[,] <- as.character(output_model[,])
+rownames(output_model) <- c("Intercept", "Ice (Yes)",
+                            "Material (Metal)", "Material (Plastic)",
+                            "Block (2)", "Block (3)", "Block (4)", "Block (5)", "Block (6)",
+                            "(Yes) + (Metal)", "(Yes) + (Plastic)")
+
+kable(output_model, caption = "Linear Model Summary")
+```
+
+Table 1 gives us a quick summary of the estimate, standard error, t-value and corresponding p-value for each factor and interaction between the two main factors. Here we can not determine any statistically significant impacts on score, but this table can be very helpful in organizing all the factors and combinations used in the full linear model.  
+
+Using the information from the table, the linear model can be represented by this equation:
+$$
+score = \beta_0 + \beta_1x_1 + \beta_2x_2 + \beta_3x_3 + ... + \beta_9x_1x_2 + \beta_{10}x_1x_3
+$$
+This equation includes a dependent variable, taste score, 11 different $\beta$ coefficients, and 8 unique independent variables $x_{1:8}$. The independent variables are a way of determining which treatment is being used to determine the tasting score. This is done by having the $x$ values equal either 0 or 1, determining if it will contribute or not contribute towards the score. 
+
+Each $\beta$ coefficient represents the effect size or change in score, dependent variable, when their multiplied $x$ value, independent variable, is equal to 1. $\beta_1$, $\beta_2$, and $\beta3$ are the effect sizes for $x_1$, $x_2$, and $x_3$, which represent yes ice, metal material, and plastic material respectively. $\beta_9$ and $\beta_{10}$ are the effect sizes for the combination of yes ice and metal and yes ice and plastic respectively, shown by having both their representative independent variables multiplying the coefficient. $\beta_0$ represents the intercept, or control effect size. This value represents all of the score when every other independent variables are false, which in this case would be no ice and glass material.
+
+$\beta_{4:8}$ are the effect sizes for blocks 2-6, but since we will not be paying attention to that we will be ignoring them in this study.
+
+```{r}
+# Overall test
+model2 <- lm(score ~ block, soda_df)
+overall_f <- anova(model2, model1)$F[2]
+overall_p <- anova(model2, model1)$P[2]
+```
+
+For the overall test, we want to find if any combination of factors impact tasting score. Our null hypothesis is given by $H_{0}: \beta_1 = \beta_2 = \beta_3 = \beta_9 = \beta_{10} = 0$, which suggests that all factors and their interactions with each other no impact on taste score. Our alternative hypothesis is given by $H_{a}: \text{At least one }   \beta_{1/2/3/9/10} \neq 0$ which means there is statistically sufficient data that some combination of factors impact taste score. 
+
+```{r}
+# Ice and interaction with Material
+model3 <- lm(score ~ material + block, soda_df)
+ice_mat_f <- anova(model3, model1)$F[2]
+ice_mat_p <- anova(model3, model1)$P[2]
+```
+
+For this partial-F test, we want to find out if the choice of ice and its interaction with cup material has an impact on taste score. Our null hypothesis is given by $H_{0}:\beta_1 = \beta_9 = \beta_{10} = 0$, the choice of ice and its interaction with cup material has no impact on taste score. Our alternative hypothesis is given by $H_{a}: \text{At least one } \beta_{1/9/10} \neq 0$.
+
+```{r}
+# Material and interaction with Ice
+model4 <- lm(score ~ ice + block, soda_df)
+mat_ice_f <- anova(model4, model1)$F[2]
+mat_ice_p <- anova(model4, model1)$P[2]
+```
+
+For this partial-F test, we want to find out if the choice of cup material and its interaction with ice has an impact on taste score. Our null hypothesis is given by $H_{0}:\beta_2 = \beta_3 = \beta_9 = \beta_{10} = 0$, the choice of cup material and its interaction with ice has no impact on taste score. Our alternative hypothesis is given by $H_{a}: \text{At least one } \beta_{2/3/9/10} \neq 0$.
+
+```{r}
+# Interaction alone
+model5 <- lm(score ~ ice + material + block, soda_df)
+interact_f <- anova(model5, model1)$F[2]
+interact_p <- anova(model5, model1)$P[2]
+```
+
+For the final partial-F test, we want to find out if the interaction between cup material and ice alone has an impact on taste score. Our null hypothesis is given by $H_{0}:\beta_9 = \beta_{10} = 0$, the interaction alone has no impact on taste score. Our alternative hypothesis is given by $H_{a}: \text{At least one } \beta_{9/10} \neq 0$.
+
+Since we are testing three partial-F tests, we need to use a Bonferonni corrected significance level in order to make up for the increased chance of a type I error caused by performing multiple tests. 
+
+```{r}
+# Bonferonni Corrected significance level
+bonferroni_p_val <- 0.05 / 3
+
+soda_f <- matrix(
+  data = c(overall_p, ice_mat_p, mat_ice_p, interact_p, bonferroni_p_val),
+  byrow = TRUE, nrow = 1, ncol = 5,
+  dimnames = list(c("Regular"),
+                  c("Overall", "Ice with Material", 
+                    "Material with Ice", "Interaction only",
+                    "Adjusted alpha"))
+)
+
+kable(format(soda_f, scientific = FALSE, digits = 3),
+      caption = "p-values from Linear Model Anovas")
+```
+
+Table 2 displays the p-values for the overall and three partial-F tests.
+
+Using significance level $\alpha = 0.05$, we can reject the null hypothesis for the overall test, concluding that there is statistically significant evidence that some combination of factors impacts the taste score.
+
+For the partial tests, we have corrected significance level  $\alpha =$ `r round(bonferroni_p_val,4)`. Comparing the p-values from table 2 to this, we can reject the null hypothesis for the choice of ice and its interaction with material, but we fail to reject for the choice of material and its interaction with ice and for the interaction itself. We conclude that there is statistically sufficient evidence that the choice of ice and its interaction with material has an impact on taste score, but we do not find statistically significant evidence that choice of material and its interaction with ice and the interaction itself has an impact on taste score.
+
+## Model Checking
+
+We proceed to check if the assumptions required for performing linear models and anova tests hold, to ensure that we are not violating any of them. In the case that an assumption is violated, we must perform a permutation test for more significant evidence for impact of factors on taste score.
+
+### Normality
+
+```{r, fig.show = "hold", out.width = "50%"}
+
+model1 %>% ggplot(aes(x = model1$residuals)) +
+  geom_histogram(bins = 15, color = 'black', fill = 'skyblue') +
+  labs(title = "Soda Taste Residuals", subtitle = "Figure 2",
+       x = "Residuals", y = "Frequency")
+
+model1 %>% ggplot(aes(sample = model1$residuals)) +
+  stat_qq(size = 2, color = 'maroon') + 
+  stat_qq_line() + labs(title = "Normal Q-Q Plot", subtitle = "Figure 3", 
+                        y = "Sample Quantities", x = "Theoretial Quantities")
+
+```
+
+Figure 2 is a histogram measuring frequency of the residual values from our full linear model. This display looks similar to a normal distribution, but has an outlier at around $x = -3$. Figure 3 is a quantile-quantile plot showing the distribution of the data along a theoretical normal distribution. Since the points wrap around the normal line relatively close, it suggests that the data is similar to the normal distribution. These figures show no concerns about departure from normality.
+
+To verify the assumption on normality, we use the Shapiro-Wilk test.
+
+```{r}
+shapiro <- data.frame(
+  p_value = shapiro.test(model1$residuals)$p.value)
+kable(shapiro, caption = "Shapiro-Wilk normality test")
+```
+
+Table 3 displays the p-value obtained from the Shapiro-Wilk test, which for significance level $\alpha = 0.05$ fails to reject the null hypothesis. We conclude from this that there is not statistically significant evidence that the residuals do not follow a normal distribution. The Shapiro-Wilk p-value can still be considered small, indicating that our data might not follow a normal distribution, which could potentially violate the assumptions.
+
+### Structure of Data & Equal Variance
+
+```{r, fig.show = "hold", out.width = "50%"}
+residual_seq <- 1:length(model1$residuals)
+
+model1 %>% ggplot(aes(y = model1$residuals, x = residual_seq)) + 
+  geom_point(size = 2, color = 'maroon') + 
+  labs(x = "Order of data collected", y = "Residuals",
+       title = "Residuals vs. order of data collected", subtitle = "Figure 4")
+model1 %>% ggplot(aes(y = model1$residuals, x = model1$fitted.values)) +
+  geom_point(size = 2, color = 'maroon') +
+  labs(x = "Fitted Values", y = "Residuals",
+       title = "Residuals vs. Fitted Values", subtitle = "Figure 5")
+```
+
+Figure 4 displays the structure of our data, which seems to bring up no large concerns. The data appears to have no pattern along the order of data collected. Figure 5 displays the residual values against the fitted values, which also seems to bring up no large concerns about inequality in variance.
+
+Our assumptions of normality of the residuals, no structure of data, and equal variance show not many concerns leading to them being violated, but since the normality verified by the Shapiro-Wilk test was so close to failing, additional permutation tests will be performed.
+
+## Permutation Test
+
+```{r, cache = TRUE}
+blocks <- unique(soda_df$block)
+
+perm_f <- NA
+perm_ice_material <- NA
+perm_material_ice <- NA
+perm_interact <- NA
+reps <- 100000
+
+for(i in 1:reps){
+  soda_perm <- soda_df
+  for(j in blocks){
+    ind <- which(soda_perm$block == j)
+    soda_perm$score[ind] <- sample(soda_perm$score[ind])
+  }
+  modela <- lm(score ~ ice + material + ice * material + block , soda_perm)
+  modelb <- lm(score ~ block, soda_perm)
+  modelc <- lm(score ~ material + block, soda_perm)
+  modeld <- lm(score ~ ice + block, soda_perm)
+  modele <- lm(score ~ ice + material + block, soda_perm)
+  
+  perm_f[i] <- anova(modelb, modela)$F[2]
+  perm_ice_material[i] <- anova(modelc, modela)$F[2]
+  perm_material_ice[i] <- anova(modeld, modela)$F[2]
+  perm_interact[i] <- anova(modele, modela)$F[2]
+}
+
+overall_perm <- sum(perm_f >= overall_f) / reps
+ice_mat_perm <- sum(perm_ice_material >= ice_mat_f, na.rm = TRUE) / reps
+mat_ice_perm <- sum(perm_material_ice >= mat_ice_f) / reps
+interact_perm <- sum(perm_interact >= interact_f, na.rm = TRUE) / reps
+```
+
+```{r}
+soda_f_perm <- matrix(
+  data = c(overall_p, ice_mat_p, mat_ice_p, interact_p,
+           overall_perm, ice_mat_perm, mat_ice_perm, interact_perm),
+  byrow = TRUE, nrow = 2, ncol = 4,
+  dimnames = list(c("Regular", "Permutation"),
+                  c("Overall", "Ice with Material", 
+                    "Material with Ice", "Interaction only"))
+)
+kable(format(soda_f_perm, scientific = FALSE, digits = 3),
+      caption = "p-values from Linear Model Anovas")
+```
+
+Table 5 displays the p-values for the anova tests under assumptions and the new p-values obtained from using a permutation test. The permutation p-values are incredibly similar for the larger p-values while still relatively similar for the smaller p-values. Each conclusion made for overall and the three partial-F tests have not changed, where the two factors that rejected the null hypothesis previously have a smaller p-value from the permutation test, suggesting more statistically significant conclusions.
+
+## Power Analysis (post-hoc)
+
+```{r, cache = TRUE}
+beta_mean <- summary(model1)$coefficients[c(1,2,3,4,10,11)]
+beta_se <- summary(model1)$coefficients[c(1,2,3,4,10,11),2]
+
+beta1 <- c(0.6,0.9,1.2)
+beta2 <- seq(-1, 0, length.out = 11)
+
+power <- NA
+count <- 1
+
+source("power_factorial_32.R")
+for(i in beta1){
+  beta_mean[2] <- i
+  for(j in 1:length(beta2)){
+    beta_mean[3] <- beta2[j]
+    power[count] <- power_factorial_32(beta_mean, beta_se, replicates = 6)
+    count <- count + 1
+  }
+}
+```
+
+```{r, fig.align = "center", out.width = "70%"}
+post_hoc <- data.frame(
+  power = power,
+  beta1 = rep(as.factor(beta1), each = 11),
+  beta2 = rep(beta2, 3)
+)
+
+post_hoc %>% ggplot(aes(x = beta2, y = power, group = beta1, color = beta1)) +
+  geom_point() + geom_line() +
+  labs(title = "Power for Different Factor Effect Sizes", subtitle = "Figure 6",
+       x = "Material (Metal)", y = "Power", color = "Ice (Yes)")
+```
+In figure 6, we observe 3 unique effect sizes of $\beta_1$ or yes ice along a sequence of 11 unique effect sizes of $\beta_2$ or metal cup material, and their combined effect on the power. For every effect size of $\beta_1$, the power stays relatively consistent for all effect sizes of $\beta_2$, only increasing slightly as effect size deviates away from $-0.5$. In contrast, as $\beta_1$ increases, power drastically increases. Having a $\beta_1$ effect size of $~1$ would end in around $80%$ power for any effect size for $\beta_2$.
+
+These findings suggest that the factor of ice has a very profound influence on the power level, whereas the factor of metal cup material has minimal influence.
+
+```{r, cache = TRUE}
+beta_mean <- summary(model1)$coefficients[c(1,2,3,4,10,11)]
+
+beta1 <- c(0.6,0.9,1.2)
+beta3 <- seq(-1.5, 0, length.out = 11)
+
+power <- NA
+count <- 1
+
+for(i in beta1){
+  beta_mean[2] <- i
+  for(j in 1:length(beta3)){
+    beta_mean[4] <- beta3[j]
+    power[count] <- power_factorial_32(beta_mean, beta_se, replicates = 6)
+    count <- count + 1
+  }
+}
+```
+
+```{r, fig.align = "center", out.width = "70%"}
+post_hoc2 <- data.frame(
+  power = power,
+  beta1 = rep(as.factor(beta1), each = 11),
+  beta3 = rep(beta3, 3)
+)
+
+post_hoc2 %>% ggplot(aes(x = beta3, y = power, group = beta1, color = beta1)) +
+  geom_point() + geom_line() +
+  labs(title = "Power for Different Factor Effect Sizes", subtitle = "Figure 7",
+       x = "Material (Plastic)", y = "Power", color = "Ice (Yes)")
+```
+
+In figure 7, we observe again the three unique effect sizes for $\beta_1$, but we plot them against 11 unique effect sizes for $\beta_3$, or plastic cup material. In this graph, we can see that power increases as $\beta_2$ decreases and becomes larger in the negative direction. Similar to before, power increases for larger values of $\beta_1$, where in order to achieve $80%$ power, for $\beta_1 = 0.6$, $\beta_2$ must be less than $-1.3$, for $\beta_1 = 0.9$, $\beta_2$ must be less than $-1$, and finally for $\beta_1 = 1.2$, $\beta_2$ must be less than $-0.2$.
+
+Along with choice of ice, effect size for the factor of plastic cup material also influences power by a good amount.
+
+# Discussion
+
+This study aimed to explore how three different materials of cups and the presence of ice influenced the perceived taste of soft-beverages, ultimately seeking to discover the optimal method of serving a soft-beverage based on customer satisfaction. Using a full factorial design with blocking, we examined the effects of two factors, the cup material and presence of ice, on taste scores, ensuring that all possible combinations were tested an equal amount of times, in a random order specific to participants.
+
+Our results indicated that having ice in the drink had a significant impact on taste score, supporting the hypothesis that temperature and potentially texture of ice are critical factors in beverage enjoyment. However, we could not find statistically significant evidence that the cup material impacted taste score. This suggests that any physical or psychological effects of the cup material, such as insulation or feeling, were insignificant to participants in the experiment.
+
+These findings have practical implications for many businesses in the beverage industry. Given the significant role of ice in enhancing a customer's perceived taste of a drink, establishments such as restaurants and bars should include ice if they haven't already in their served drinks. Conversely, if not for the visual aspect that was untested in this experiment, these establishments should not invest in cups made of specific materials with the purpose of improving the taste of their drinks.
+
+Several issues have to be considered with this experiment design. First, while this full factorial design was able to explore the two factors thoroughly, there still exist many more factors that contributed to the taste of the drink, such as carbonation, sweetness, or personal opinions of each participant. Along with that, the study was done with a small sample size that wasn't calculated through power analysis before, due to the lack of research done in this field.
+
+Future researchers could expand on the ideas explored in this experiment, potentially exploring the impact of all sensory feeling on taste of the drink. Going even further, researchers could veer away from the 5 sensory feelings and explore the impact of other psychological effects on taste of beverages, similar to this study done on taste preferences based off brand names (Breneiser, 2011). 
+
+Readdressing the potential situation of a soft-beverage brand struggling in the growing market, much research can be done in order to support smaller businesses, even if it is just exploring something small as impact of ice on taste of soda. Along with strong evidence, innovative minds are also necessary for finding solutions to new arising problems in the world.
+
+# References 
+
+Lefebvre, S., & Orlowski, M. (2019). Can, cup, or bottle? The influence of beverage vessel on taste and willingness to pay. International journal of hospitality management, 76, 194-205.
+
+Suhag, N. (2017). Functional non-alcoholic beverages: Shifts in the purchasing patterns of non-alcoholic beverages. Available at SSRN 2992428.
+
+Breneiser, J. E., & Allen, S. N. (2011). Taste Preference for Brand Name versus Store Brand Sodas. North American Journal of Psychology, 13(2).
